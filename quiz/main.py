@@ -1,11 +1,14 @@
 import flet as ft
 import threading
 import time 
+from recorder import Recorder
+
+#from record import record_screen
 
 # Função para destacar a resposta correta
 def highlight_correct_answer(correct_button):
     #time.sleep(3)  # Aguarda 3 segundos
-    correct_button.bgcolor = ft.colors.GREEN  # Muda a cor de fundo para verde
+    correct_button.bgcolor = ft.Colors.GREEN  # Muda a cor de fundo para verde
     correct_button.update()
 
 def main(page: ft.Page):
@@ -13,12 +16,24 @@ def main(page: ft.Page):
     page.title = "Quiz"    
     page.theme_mode = ft.ThemeMode.DARK
     page.padding = 20
-    page.window.width = 40 * 9  # Define a largura da janela
-    page.window.height = 40 * 19.5  # Define a altura da janela
+    page.window.frameless = True
+    page.window.top = 0
+    page.window.left = 0
+    page.window.height = 600  # Define a altura da janela
+    page.window.width = 800  # Define a largura da janela   
     page.window.resizable = False  # Impede o redimensionamento da janela
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER    
+    # page.orientation = "landscape"
+
+    async def enforce_size():
+        await asyncio.sleep(0.1)  # Atraso para garantir renderização
+        page.window_height = 1080
+        page.window_width = 1920
+        
+        page.update()
+
+    #page.on_ready = enforce_size   
 
     style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=16))
     
@@ -39,20 +54,33 @@ def main(page: ft.Page):
     
     quiz_container = ft.Container(content=ft.Column(controls=[
         question_container, button_container, progress_bar_container
-    ]))
+    ]),rotate=-1.5708)
 
     transition_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=16, weight=ft.FontWeight.BOLD)
-    transition_container = ft.Container(content=transition_text)
+    transition_container = ft.Container(content=transition_text,rotate=-1.5708)
 
     main_container = set_animation(transition_container)
 
     def animate():
         main_container.content = transition_container if main_container.content == quiz_container else quiz_container
         main_container.update()
+  
     # Layout com a pergunta e os botões de resposta
     page.add(main_container)
+   
 
-    time.sleep(1)
+    def close_window(e):        
+        page.window.destroy()
+    
+    page.window.on_event = close_window
+
+    geometry = (tuple(map(int, (page.window.left, page.window.top, page.window.width, page.window.height))))
+    
+    recorder = Recorder(geometry)
+
+    recorder.start_recording()
+
+    time.sleep(1)    
     animate()
 
     progress_bar_update(page, progress_bar)
@@ -60,10 +88,12 @@ def main(page: ft.Page):
 
     time.sleep(1)
     animate()
+    
+    time.sleep(2)
+    recorder.stop_recording()    
 
-    # Inicia a thread para destacar a resposta correta
-   # threading.Thread(target=highlight_correct_answer, args=(button2,), daemon=True).start()
 
+  
 def set_animation(initial_container):
     return ft.AnimatedSwitcher(
         initial_container,

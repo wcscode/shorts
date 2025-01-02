@@ -1,37 +1,54 @@
-import flet as ft
+# importing the required packages
+import pyautogui
+import cv2
+import numpy as np
 
-def main(page: ft.Page):
+# Specify resolution
+resolution = (1920, 1080)
 
-    c1 = ft.Container(
-        ft.Text("Hello!", style=ft.TextThemeStyle.HEADLINE_MEDIUM),
-        alignment=ft.alignment.center,
-        width=200,
-        height=200,
-        bgcolor=ft.colors.GREEN,
-    )
-    c2 = ft.Container(
-        ft.Text("Bye!", size=50),
-        alignment=ft.alignment.center,
-        width=200,
-        height=200,
-        bgcolor=ft.colors.YELLOW,
-    )
-    c = ft.AnimatedSwitcher(
-        c1,
-        transition=ft.AnimatedSwitcherTransition.SCALE,
-        duration=500,
-        reverse_duration=100,
-        switch_in_curve=ft.AnimationCurve.BOUNCE_OUT,
-        switch_out_curve=ft.AnimationCurve.BOUNCE_IN,
-    )
+# Specify video codec
+codec = cv2.VideoWriter_fourcc(*"XVID")
 
-    def animate(e):
-        c.content = c2 if c.content == c1 else c1
-        c.update()
+# Specify name of Output file
+filename = "Recording.avi"
 
-    page.add(
-        c,
-        ft.ElevatedButton("Animate!", on_click=animate),
-    )
+# Specify frames rate. We can choose any 
+# value and experiment with it
+fps = 60.0
 
-ft.app(main)
+
+# Creating a VideoWriter object
+out = cv2.VideoWriter(filename, codec, fps, resolution)
+
+# Create an Empty window
+cv2.namedWindow("Live", cv2.WINDOW_NORMAL)
+
+# Resize this window
+cv2.resizeWindow("Live", 480, 270)
+
+while True:
+	# Take screenshot using PyAutoGUI
+	img = pyautogui.screenshot()
+
+	# Convert the screenshot to a numpy array
+	frame = np.array(img)
+
+	# Convert it from BGR(Blue, Green, Red) to
+	# RGB(Red, Green, Blue)
+	frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+	# Write it to the output file
+	out.write(frame)
+	
+	# Optional: Display the recording screen
+	cv2.imshow('Live', frame)
+	
+	# Stop recording when we press 'q'
+	if cv2.waitKey(1) == ord('q'):
+		break
+
+# Release the Video writer
+out.release()
+
+# Destroy all windows
+cv2.destroyAllWindows()
