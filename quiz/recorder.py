@@ -10,31 +10,38 @@ class Recorder:
         self.thread = None
 
     def _record(self):
-        x, y, width, height = self._geometry_offset()     
+        # Ajuste da geometria
+        x, y, width, height = self._geometry_adjustments()     
            
-        #print(f"Width: {width}, Height: {height}")  # Verifique os valores aqui
         if not isinstance(width, int) or not isinstance(height, int):
             raise ValueError("Width and height must be integers.")
 
+        # Inverte dimensões para rotação de 90 graus
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
         try:
-            out = cv2.VideoWriter('output.avi', fourcc, 120, (width, height))
+            out = cv2.VideoWriter('output.avi', fourcc, 30, (height, width))  # Inverte width e height
         except Exception as e:
             print(f"Erro ao criar VideoWriter: {e}")
             return
 
+        # Captura de tela e gravação
         with mss.mss() as sct:
             while self.recording:
                 screenshot = sct.grab({"top": y, "left": x, "width": width, "height": height})
                 frame = np.array(screenshot)
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+
+                # Rotaciona o frame em 90 graus sentido horário
+                frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
                 out.write(frame)
 
         out.release()
+        print("Gravação encerrada.")
 
-    def _geometry_offset(self):
+    def _geometry_adjustments(self):
+        # Ajuste da geometria para compensar bordas ou deslocamentos
         x, y, width, height = self.geometry
-        return (x + 1, y + 25, width, height)
+        return (x, y, width, height)
 
     def start_recording(self):
         print('Iniciando a gravação...')

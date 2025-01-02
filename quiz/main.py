@@ -19,26 +19,17 @@ def main(page: ft.Page):
     page.window.frameless = True
     page.window.top = 0
     page.window.left = 0
-    page.window.height = 600  # Define a altura da janela
-    page.window.width = 800  # Define a largura da janela   
+    page.window.height = 720  # Define a altura da janela
+    page.window.width = 1280  # Define a largura da janela       
     page.window.resizable = False  # Impede o redimensionamento da janela
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    # page.orientation = "landscape"
-
-    async def enforce_size():
-        await asyncio.sleep(0.1)  # Atraso para garantir renderização
-        page.window_height = 1080
-        page.window_width = 1920
-        
-        page.update()
-
-    #page.on_ready = enforce_size   
-
-    style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=16))
+    horizontal_padding = 20 + ((page.window.width - page.window.height) / 2)
+    print(horizontal_padding)
+    style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=20))
     
     # Pergunta e alternativas
-    question = ft.Text("Qual é a capital da França?", text_align=ft.TextAlign.CENTER, size=16, weight=ft.FontWeight.BOLD)    
+    question = ft.Text("Qual é a capital da França?", text_align=ft.TextAlign.CENTER, size=20, weight=ft.FontWeight.BOLD)    
 
     button1 = ft.ElevatedButton("Londres", width=page.width, style=style_button)
     button2 = ft.ElevatedButton("Paris", width=page.width, style=style_button)
@@ -54,19 +45,19 @@ def main(page: ft.Page):
     
     quiz_container = ft.Container(content=ft.Column(controls=[
         question_container, button_container, progress_bar_container
-    ]),rotate=-1.5708)
+    ]),rotate=-1.5708, padding=ft.padding.symmetric(horizontal=horizontal_padding))
 
-    transition_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=16, weight=ft.FontWeight.BOLD)
+    transition_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=40, weight=ft.FontWeight.BOLD)
     transition_container = ft.Container(content=transition_text,rotate=-1.5708)
 
     main_container = set_animation(transition_container)
 
-    def animate():
+    def change_content():
         main_container.content = transition_container if main_container.content == quiz_container else quiz_container
         main_container.update()
   
     # Layout com a pergunta e os botões de resposta
-    page.add(main_container)
+    page.add(ft.Container(content=main_container))
    
 
     def close_window(e):        
@@ -81,13 +72,13 @@ def main(page: ft.Page):
     recorder.start_recording()
 
     time.sleep(1)    
-    animate()
+    change_content()
 
     progress_bar_update(page, progress_bar)
     highlight_correct_answer(button2)
 
-    time.sleep(1)
-    animate()
+    time.sleep(2)
+    change_content()
     
     time.sleep(2)
     recorder.stop_recording()    
@@ -101,7 +92,7 @@ def set_animation(initial_container):
         duration=1000,
         reverse_duration=100,
         switch_in_curve=ft.AnimationCurve.EASE_IN_OUT_CIRC,
-        switch_out_curve=ft.AnimationCurve.EASE_IN_OUT_CIRC,
+        switch_out_curve=ft.AnimationCurve.EASE_IN_OUT_CIRC,        
     )
 
 def progress_bar_update(page, progress_bar):
