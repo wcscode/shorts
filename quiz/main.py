@@ -2,7 +2,7 @@ import flet as ft
 import threading
 import time 
 from recorder import Recorder
-
+from game import Game
 #from record import record_screen
 
 # Função para destacar a resposta correta
@@ -28,13 +28,15 @@ def main(page: ft.Page):
     print(horizontal_padding)
     style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=20))
     
-    # Pergunta e alternativas
-    question = ft.Text("Qual é a capital da França?", text_align=ft.TextAlign.CENTER, size=20, weight=ft.FontWeight.BOLD)    
+    game = Game()
 
-    button1 = ft.ElevatedButton("Londres", width=page.width, style=style_button)
-    button2 = ft.ElevatedButton("Paris", width=page.width, style=style_button)
-    button3 = ft.ElevatedButton("Berlim", width=page.width, style=style_button)
-    button4 = ft.ElevatedButton("Roma", width=page.width, style=style_button)   
+    # Pergunta e alternativas
+    question = ft.Text(game.get_question(), text_align=ft.TextAlign.CENTER, size=20, weight=ft.FontWeight.BOLD)    
+
+    button1 = ft.ElevatedButton(game.get_answer(0), width=page.width, style=style_button)
+    button2 = ft.ElevatedButton(game.get_answer(1), width=page.width, style=style_button)
+    button3 = ft.ElevatedButton(game.get_answer(2), width=page.width, style=style_button)
+    button4 = ft.ElevatedButton(game.get_answer(3), width=page.width, style=style_button)   
 
     progress_bar = ft.ProgressBar(height=10,color="amber")   
 
