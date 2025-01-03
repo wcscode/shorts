@@ -24,8 +24,7 @@ def main(page: ft.Page):
     page.window.resizable = False  # Impede o redimensionamento da janela
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    horizontal_padding = 20 + ((page.window.width - page.window.height) / 2)
-    print(horizontal_padding)
+    horizontal_padding = 20 + ((page.window.width - page.window.height) / 2)   
     style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=20))
     
     # Pergunta e alternativas
@@ -57,15 +56,14 @@ def main(page: ft.Page):
         main_container.update()
   
     # Layout com a pergunta e os botões de resposta
-    page.add(ft.Container(content=main_container))
-   
+    page.add(ft.Container(content=main_container))   
 
     def close_window(e):        
         page.window.destroy()
     
     page.window.on_event = close_window
 
-    geometry = (tuple(map(int, (page.window.left, page.window.top, page.window.width, page.window.height))))
+    geometry = (tuple(map(int, (page.window.top, page.window.left, page.window.width, page.window.height))))
     
     recorder = Recorder(geometry)
 
@@ -101,10 +99,6 @@ def progress_bar_update(page, progress_bar):
         time.sleep(0.05)
         page.update()
 
-# Função para exibir o pop-up com o resultado
-def show_popup(e, result):
-    msg = "Resposta correta!" if result == "correta" else "Resposta incorreta!"
-    ft.dialog.MessageDialog(title="Resultado", content=ft.Text(msg)).show()
 
 # Executa o aplicativo
 ft.app(target=main)
