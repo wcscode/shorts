@@ -3,13 +3,6 @@ import threading
 import time 
 from recorder import Recorder
 from game import Game
-#from record import record_screen
-
-# Função para destacar a resposta correta
-def highlight_correct_answer(correct_button):
-    #time.sleep(3)  # Aguarda 3 segundos
-    correct_button.bgcolor = ft.Colors.GREEN  # Muda a cor de fundo para verde
-    correct_button.update()
 
 def main(page: ft.Page):
     # Configura a janela da aplicação
@@ -36,11 +29,13 @@ def main(page: ft.Page):
     button2 = ft.ElevatedButton(game.get_answer(1), width=page.width, style=style_button)
     button3 = ft.ElevatedButton(game.get_answer(2), width=page.width, style=style_button)
     button4 = ft.ElevatedButton(game.get_answer(3), width=page.width, style=style_button)   
+    
+    buttons = [button1, button2, button3, button4]
 
     progress_bar = ft.ProgressBar(height=10,color="amber")   
 
     question_container = ft.Container(content=question, width=page.width, margin=ft.margin.only(bottom=40))
-    buttons_columns = ft.Column(controls = [button1, button2, button3, button4])
+    buttons_columns = ft.Column(controls=buttons)
     button_container = ft.Container(content=buttons_columns, margin=ft.margin.only(bottom=40))
     progress_bar_container = ft.Container(content=progress_bar)
     
@@ -67,7 +62,7 @@ def main(page: ft.Page):
 
     geometry = (tuple(map(int, (page.window.top, page.window.left, page.window.width, page.window.height))))
     
-    recorder = Recorder(geometry)
+    recorder = Recorder(geometry, game.get_question_and_answers_text())
 
     recorder.start_recording()
 
@@ -75,15 +70,15 @@ def main(page: ft.Page):
     change_content()
 
     progress_bar_update(page, progress_bar)
-    highlight_correct_answer(button2)
+    highlight_correct_answer(buttons, game.get_correct_answer_index())
 
     time.sleep(2)
     change_content()
     
     time.sleep(2)
-    recorder.stop_recording()    
+    recorder.stop_recording()   
 
-
+    page.window.destroy() 
   
 def set_animation(initial_container):
     return ft.AnimatedSwitcher(
@@ -101,6 +96,9 @@ def progress_bar_update(page, progress_bar):
         time.sleep(0.05)
         page.update()
 
+def highlight_correct_answer(buttons, correct_answer_index):    
+    buttons[correct_answer_index].bgcolor = ft.Colors.GREEN  # Muda a cor de fundo para verde
+    buttons[correct_answer_index].update()
 
 # Executa o aplicativo
 ft.app(target=main)
