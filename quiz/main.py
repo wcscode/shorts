@@ -1,7 +1,8 @@
 import flet as ft
-import threading
 import time 
 from recorder import Recorder
+from audio import Audio
+from compiler import Compiler
 from game import Game
 
 def main(page: ft.Page):
@@ -62,8 +63,8 @@ def main(page: ft.Page):
 
     geometry = (tuple(map(int, (page.window.top, page.window.left, page.window.width, page.window.height))))
     
-    recorder = Recorder(geometry, game.get_question_and_answers_text())
-
+    recorder = Recorder(geometry)
+   
     recorder.start_recording()
 
     time.sleep(1)    
@@ -77,6 +78,19 @@ def main(page: ft.Page):
     
     time.sleep(2)
     recorder.stop_recording()   
+
+    audio = Audio()   
+
+    audio.create(game.get_question_and_answers_text(), "audio_file_1")    
+    audio.create(game.get_correct_answer_text(), "audio_file_2")
+    
+    compiler = Compiler()
+   
+    compiler.merge_video_with_multiple_audios(
+        recorder.get_file_name(),
+        audio.get_files_names(), 
+        [1, audio.get_duration(audio.get_files_names()[0]) + 3]
+    )
 
     page.window.destroy() 
   
