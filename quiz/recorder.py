@@ -13,6 +13,21 @@ class Recorder:
         self.thread = None               
         self.video_file_name = "output.avi"
 
+    def start_recording(self):
+        print('Iniciando a gravação...')
+        self.recording = True
+        self.thread = threading.Thread(target=self._record)
+        self.thread.start()
+
+    def stop_recording(self):
+        print('Encerrando a gravação...')
+        self.recording = False
+        if self.thread:
+            self.thread.join()
+    
+    def get_file_name(self):
+        return self.video_file_name
+    
     def _record(self):
         # Ajuste da geometria
         top, left, width, height = self._geometry_adjustments()     
@@ -50,17 +65,3 @@ class Recorder:
         top, left, width, height = self.geometry
         return (top, left, width, height)
    
-    def start_recording(self):
-        print('Iniciando a gravação...')
-        self.recording = True
-        self.thread = threading.Thread(target=self._record)
-        self.thread.start()
-
-    def stop_recording(self):
-        print('Encerrando a gravação...')
-        self.recording = False
-        if self.thread:
-            self.thread.join()
-    
-    def get_file_name(self):
-        return self.video_file_name

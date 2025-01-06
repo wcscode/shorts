@@ -4,6 +4,7 @@ from recorder import Recorder
 from audio import Audio
 from compiler import Compiler
 from game import Game
+from game_animation import GameAnimation
 
 def main(page: ft.Page):
     # Configura a janela da aplicação
@@ -47,7 +48,15 @@ def main(page: ft.Page):
     transition_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=40, weight=ft.FontWeight.BOLD)
     transition_container = ft.Container(content=transition_text,rotate=-1.5708)
 
-    main_container = set_animation(transition_container)
+    game_animation = GameAnimation(ft)
+
+    animation_duration = 1000
+    animation_reverse_duration = 100
+
+    main_container = game_animation.set_animation(
+        transition_container, 
+        animation_duration, 
+        animation_reverse_duration)
 
     def change_content():
         main_container.content = transition_container if main_container.content == quiz_container else quiz_container
@@ -56,10 +65,15 @@ def main(page: ft.Page):
     # Layout com a pergunta e os botões de resposta
     page.add(ft.Container(content=main_container))   
 
-    def close_window(e):        
-        page.window.destroy()
+    #def close_window(e):        
+    #    page.window.destroy()
     
-    page.window.on_event = close_window
+    #page.window.on_event = close_window
+
+    audio = Audio()   
+
+    audio_duration_1 = audio.create(game.get_question_and_answers_text(), "audio_file_1")    
+    audio_duration_2 = audio.create(game.get_correct_answer_text(), "audio_file_2")
 
     geometry = (tuple(map(int, (page.window.top, page.window.left, page.window.width, page.window.height))))
     
@@ -70,49 +84,24 @@ def main(page: ft.Page):
     time.sleep(1)    
     change_content()
 
-    progress_bar_update(page, progress_bar)
-    highlight_correct_answer(buttons, game.get_correct_answer_index())
+    game_animation.progress_bar_update(page, progress_bar)
+    game_animation.highlight_correct_answer(buttons, game.get_correct_answer_index())
 
     time.sleep(2)
     change_content()
     
     time.sleep(2)
-    recorder.stop_recording()   
-
-    audio = Audio()   
-
-    audio.create(game.get_question_and_answers_text(), "audio_file_1")    
-    audio.create(game.get_correct_answer_text(), "audio_file_2")
+    recorder.stop_recording()  
     
     compiler = Compiler()
    
     compiler.merge_video_with_multiple_audios(
         recorder.get_file_name(),
         audio.get_files_names(), 
-        [1, audio.get_duration(audio.get_files_names()[0]) + 3]
+        [1, audio_duration_1]
     )
 
     page.window.destroy() 
-  
-def set_animation(initial_container):
-    return ft.AnimatedSwitcher(
-        initial_container,
-        transition=ft.AnimatedSwitcherTransition.SCALE,
-        duration=1000,
-        reverse_duration=100,
-        switch_in_curve=ft.AnimationCurve.EASE_IN_OUT_CIRC,
-        switch_out_curve=ft.AnimationCurve.EASE_IN_OUT_CIRC,        
-    )
-
-def progress_bar_update(page, progress_bar):
-    for i in range(0, 101):
-        progress_bar.value = i * 0.01
-        time.sleep(0.05)
-        page.update()
-
-def highlight_correct_answer(buttons, correct_answer_index):    
-    buttons[correct_answer_index].bgcolor = ft.Colors.GREEN  # Muda a cor de fundo para verde
-    buttons[correct_answer_index].update()
 
 # Executa o aplicativo
 ft.app(target=main)

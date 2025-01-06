@@ -11,8 +11,8 @@ class Compiler:
         
         # Prepara os streams de áudio com adelay
         audio_streams = []
-        for audio_file_name, timestamp in zip(audios_files_names, audios_timestamps):
-            audio = ffmpeg.input(os.path.join(self.directory, audio_file_name))
+        for audio_file_name, timestamp in zip(audios_files_names, audios_timestamps):           
+            audio = ffmpeg.input(os.path.join(self.directory, audio_file_name))            
             delay_filter = f"{timestamp * 1000}|{timestamp * 1000}"  # Milissegundos
             audio = audio.filter("adelay", delay_filter)
             audio_streams.append(audio)
@@ -25,6 +25,7 @@ class Compiler:
 
         # Gera a saída com vídeo e áudio combinados
         output_path = os.path.join(self.directory, self.final_video_file_name)
+        print(f'xxx {output_path}')
         ffmpeg_output = ffmpeg.output(
             input_video,
             mixed_audio,
@@ -32,7 +33,7 @@ class Compiler:
             vcodec="libx264",
             acodec="aac",
             strict="experimental"
-        )
+        ).overwrite_output().global_args('-hide_banner', '-loglevel', 'warning')
 
         # Executa o comando do ffmpeg
         ffmpeg_output.run()
