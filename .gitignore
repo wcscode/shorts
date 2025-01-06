@@ -1,4 +1,7 @@
 .venv/
+files
 quiz/output.avi
 quiz/__pycache__/*
 counter
+quiz/audio.mp3
+quiz/final_output.mp4
