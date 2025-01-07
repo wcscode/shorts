@@ -5,6 +5,7 @@ from audio import Audio
 from compiler import Compiler
 from game import Game
 from game_animation import GameAnimation
+from timeline import Timeline
 
 def main(page: ft.Page):
     # Configura a janela da aplicação
@@ -34,7 +35,7 @@ def main(page: ft.Page):
     
     buttons = [button1, button2, button3, button4]
 
-    progress_bar = ft.ProgressBar(height=10,color="amber")   
+    progress_bar = ft.ProgressBar(height=10,color="amber", value=0)   
 
     question_container = ft.Container(content=question, width=page.width, margin=ft.margin.only(bottom=40))
     buttons_columns = ft.Column(controls=buttons)
@@ -59,19 +60,13 @@ def main(page: ft.Page):
     main_container = game_animation.set_splash_screen_animation(
         splash_screen_container, 
         animation_duration, 
-        animation_reverse_duration)
+        animation_reverse_duration)   
 
     def change_content():
         main_container.content = splash_screen_container if main_container.content == quiz_container else quiz_container
-        main_container.update()
-  
-    # Layout com a pergunta e os botões de resposta
-    page.add(ft.Container(content=main_container))   
+        main_container.update()  
 
-    #def close_window(e):        
-    #    page.window.destroy()
-    
-    #page.window.on_event = close_window
+    page.add(ft.Container(content=main_container))       
 
     audio = Audio()   
 
@@ -80,20 +75,27 @@ def main(page: ft.Page):
 
     geometry = (tuple(map(int, (page.window.top, page.window.left, page.window.width, page.window.height))))
     
-    recorder = ScreenRecorder(geometry)
-   
+    timeline = Timeline()
+    timeline.start()
+
+    recorder = ScreenRecorder(geometry)    
     recorder.start_recording()
 
-    time.sleep(1)    
-    change_content()
+    timeline.wait("INIT_SPLASH_SCREEN", 2)
+    change_content()    
 
+    timeline.wait("INIT_READ_QUESTION", 1)
+    timeline.wait("READ_QUESTION", audio_duration_1) 
     game_animation.progress_bar_update(page, progress_bar)
+     
     game_animation.highlight_correct_answer(buttons, game.get_correct_answer_index())
+    timeline.register("INIT_READ_ANSWER")
+    timeline.wait("READ_ANSWER", audio_duration_2) 
 
-    time.sleep(2)
+    timeline.wait("RETURN_SPLASH_SCREEN", 2)  
     change_content()
     
-    time.sleep(2)
+    timeline.wait("END_RECORD", 1)  
     recorder.stop_recording()  
     
     compiler = Compiler()
@@ -101,7 +103,7 @@ def main(page: ft.Page):
     compiler.merge_video_with_multiple_audios(
         recorder.get_file_name(),
         audio.get_files_names(), 
-        [1, audio_duration_1]
+        [timeline.recovery("INIT_READ_QUESTION"), timeline.recovery("INIT_READ_ANSWER")]
     )
 
     page.window.destroy() 

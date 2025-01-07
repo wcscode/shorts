@@ -18,7 +18,7 @@ class GameAnimation:
     def progress_bar_update(self, page, progress_bar):
         for i in range(0, 101):
             progress_bar.value = i * 0.01
-            time.sleep(0.05)
+            time.sleep(0.04)
             page.update()
 
     def highlight_correct_answer(self, buttons, correct_answer_index):    
