@@ -4,26 +4,32 @@ import numpy as np
 import threading
 import platform
 import os
+import time
 
-class Recorder:
+class ScreenRecorder:
     def __init__(self, window_geometry,directory="files"):
         self.geometry = window_geometry  # (x, y, width, height)
         self.directory = directory
         self.recording = False
         self.thread = None               
         self.video_file_name = "output.avi"
+        self.start_time = None
 
     def start_recording(self):
+        self.start_time = time.time()
         print('Iniciando a gravação...')
         self.recording = True
         self.thread = threading.Thread(target=self._record)
         self.thread.start()
 
-    def stop_recording(self):
-        print('Encerrando a gravação...')
-        self.recording = False
+    def stop_recording(self):       
+        self.recording = False        
         if self.thread:
             self.thread.join()
+        
+        end_time = time.time()
+        elapsed_time = end_time - self.start_time
+        print(f"Encerrando a gravação...Tempo total: {elapsed_time:.2f} segundos.")
     
     def get_file_name(self):
         return self.video_file_name

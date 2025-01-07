@@ -1,10 +1,11 @@
-import time 
+import time
+from threading import Thread
 
 class GameAnimation:
     def __init__(self, ft):
         self.ft = ft
 
-    def set_splash_animation(self, initial_container, duration, reverse_duration):
+    def set_splash_screen_animation(self, initial_container, duration, reverse_duration):
         return self.ft.AnimatedSwitcher(
             initial_container,
             transition=self.ft.AnimatedSwitcherTransition.SCALE,
@@ -23,3 +24,19 @@ class GameAnimation:
     def highlight_correct_answer(self, buttons, correct_answer_index):    
         buttons[correct_answer_index].bgcolor = self.ft.Colors.GREEN  # Muda a cor de fundo para verde
         buttons[correct_answer_index].update()
+
+    def contador(self, page, text):
+        contador = text
+        contador.value = "0"
+        # Função para atualizar o contador a cada segundo
+        def iniciar_contagem():
+            while True:
+                contador.value = str(int(contador.value) + 1)
+                page.update()
+                time.sleep(1)  # Pausa de 1 segundo
+
+        # Inicia a contagem em uma thread separada
+        contador_thread = Thread(target=iniciar_contagem, daemon=True)
+        contador_thread.start()
+
+        #page.add(contador)

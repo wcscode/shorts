@@ -1,6 +1,6 @@
 import flet as ft
 import time 
-from recorder import Recorder
+from screen_recorder import ScreenRecorder
 from audio import Audio
 from compiler import Compiler
 from game import Game
@@ -45,21 +45,24 @@ def main(page: ft.Page):
         question_container, button_container, progress_bar_container
     ]),rotate=-1.5708, padding=ft.padding.symmetric(horizontal=horizontal_padding))
 
-    transition_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)
-    transition_container = ft.Container(content=transition_text,rotate=-1.5708)
+    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)
+    splash_screen_container = ft.Container(content=splash_screen_text,rotate=-1.5708)
 
     game_animation = GameAnimation(ft)
+
+    #Contador
+    #game_animation.contador(page, question)
 
     animation_duration = 1000
     animation_reverse_duration = 100
 
-    main_container = game_animation.set_animation(
-        transition_container, 
+    main_container = game_animation.set_splash_screen_animation(
+        splash_screen_container, 
         animation_duration, 
         animation_reverse_duration)
 
     def change_content():
-        main_container.content = transition_container if main_container.content == quiz_container else quiz_container
+        main_container.content = splash_screen_container if main_container.content == quiz_container else quiz_container
         main_container.update()
   
     # Layout com a pergunta e os botões de resposta
@@ -77,7 +80,7 @@ def main(page: ft.Page):
 
     geometry = (tuple(map(int, (page.window.top, page.window.left, page.window.width, page.window.height))))
     
-    recorder = Recorder(geometry)
+    recorder = ScreenRecorder(geometry)
    
     recorder.start_recording()
 
