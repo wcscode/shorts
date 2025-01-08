@@ -32,6 +32,7 @@ class Compiler:
             output_path,
             vcodec="libx264",
             acodec="aac",
+            pix_fmt="yuv420p",
             strict="experimental"
         ).overwrite_output().global_args('-hide_banner', '-loglevel', 'warning')
 
