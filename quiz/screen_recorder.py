@@ -48,7 +48,8 @@ class ScreenRecorder:
                 os.path.join(self.directory, self.video_file_name),
                 fourcc,
                 self.fps,
-                (height, width)  # Inverte width e height
+                (height, width) # Inverte width e height
+                #isColor=True
             )
         except Exception as e:
             print(f"Erro ao criar VideoWriter: {e}")
@@ -64,7 +65,7 @@ class ScreenRecorder:
                 if frame_count < expected_frames:
                     screenshot = sct.grab({"top": top, "left": left, "width": width, "height": height})
                     frame = np.array(screenshot)
-                    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)                   
                     frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
                     out.write(frame)
                     frame_count += 1

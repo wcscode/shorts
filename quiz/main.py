@@ -15,8 +15,8 @@ def main(page: ft.Page):
     page.window.frameless = True
     page.window.top = 0
     page.window.left = 0
-    page.window.height = 720  # Define a altura da janela
-    page.window.width = 1280  # Define a largura da janela       
+    page.window.height = 360 #720  # Define a altura da janela
+    page.window.width = 640 #1280  # Define a largura da janela       
     page.window.resizable = False  # Impede o redimensionamento da janela
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
