@@ -44,38 +44,22 @@ class Compiler:
 
         # Preparar streams de áudio
         audio_streams = []
-        for i, track in enumerate(self.audio_tracks):
-            audio_path = os.path.join(self.directory, track["file"])
-            audio = ffmpeg.input(audio_path)
-
-            # Dividir o fluxo de áudio para múltiplas saídas
-            audio_split = audio.filter('asplit', outputs=2)
-
-            # Ajustar o volume (usar o rótulo 'a0' da saída do asplit)
-            audio_volume = audio_split['a0'].filter('volume', volume=track["volume"])
-
-            # Adicionar atraso ao áudio
+        for track in self.audio_tracks:
+            audio = ffmpeg.input(os.path.join(self.directory, track["file"]))                        
+            audio_volume = audio.filter('volume', track["volume"])            
             delay_filter = f"{int(track['start_time'] * 1000)}|{int(track['start_time'] * 1000)}"  # Em milissegundos
             delayed_audio = audio_volume.filter("adelay", delay_filter)
 
             audio_streams.append(delayed_audio)
 
         # Processar músicas de fundo
-        for i, track in enumerate(self.background_tracks):
-            bg_audio_path = os.path.join(self.directory, track["file"])
-            bg_audio = ffmpeg.input(bg_audio_path)
+        for track in self.background_tracks:
+            bg_audio = ffmpeg.input(os.path.join(self.directory, track["file"]))                        
+            bg_audio_volume = bg_audio.filter('volume', volume=track["volume"])            
 
-            # Dividir o fluxo de áudio
-            bg_audio_split = bg_audio.filter('asplit', outputs=2)
-
-            # Ajustar o volume (usar o rótulo 'a0')
-            bg_audio_volume = bg_audio_split['a0'].filter('volume', volume=track["volume"])
-
-            # Repetir o áudio, se necessário
             if track["loop"]:
-                bg_audio_volume = bg_audio_volume.filter('aloop', loop=-1, size=video_duration * 44100)
-
-            # Adicionar atraso para o início da música
+                bg_audio_volume = bg_audio_volume.filter('aloop', loop=-1, size=video_duration) # * 44100)
+            
             delay_filter = f"{int(track['start_time'] * 1000)}|{int(track['start_time'] * 1000)}"  # Em milissegundos
             delayed_bg_audio = bg_audio_volume.filter("adelay", delay_filter)
 
