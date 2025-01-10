@@ -103,7 +103,7 @@ def main(page: ft.Page):
     compiler.add_video(recorder.get_file_name())    
     compiler.add_audio(audio.get_files_names()[0], timeline.recovery("INIT_READ_QUESTION")) 
     compiler.add_audio(audio.get_files_names()[1], timeline.recovery("INIT_READ_ANSWER")) 
-    #compiler.add_background_music("free-stile.mp3")
+    compiler.add_background_music("free-stile.mp3", timeline.recovery("INIT_READ_QUESTION"))
     compiler.compile()
     
     page.window.destroy() 

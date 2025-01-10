@@ -55,16 +55,23 @@ class Compiler:
         # Processar músicas de fundo
         for track in self.background_tracks:
             bg_audio = ffmpeg.input(os.path.join(self.directory, track["file"]))                        
-            bg_audio_volume = bg_audio.filter('volume', volume=track["volume"])            
+            bg_audio_volume = bg_audio.filter('volume', track["volume"])            
+
+            # Obter informações da música de fundo
+            bg_audio_info = ffmpeg.probe(os.path.join(self.directory, track["file"]))
+            bg_audio_duration = float(bg_audio_info['format']['duration'])
+            sample_rate = int(bg_audio_info['streams'][0]['sample_rate'])  # Taxa de amostragem
 
             if track["loop"]:
-                bg_audio_volume = bg_audio_volume.filter('aloop', loop=-1, size=video_duration) # * 44100)
-            
+                # Calcula o número correto de quadros para o aloop
+                loop_size = int(sample_rate * bg_audio_duration)  # Quadros totais no áudio original
+                #bg_audio_volume = bg_audio_volume.filter('aloop', loop=-1, size=loop_size)                
+
             delay_filter = f"{int(track['start_time'] * 1000)}|{int(track['start_time'] * 1000)}"  # Em milissegundos
             delayed_bg_audio = bg_audio_volume.filter("adelay", delay_filter)
 
             audio_streams.append(delayed_bg_audio)
-
+       
         # Mesclar os áudios
         if len(audio_streams) > 1:
             mixed_audio = ffmpeg.filter(audio_streams, 'amix', inputs=len(audio_streams), duration='longest')
@@ -82,5 +89,6 @@ class Compiler:
             strict="experimental"
         ).overwrite_output().global_args('-hide_banner', '-loglevel', 'warning')
 
+        print("Passow...........................")
         ffmpeg_output.run()
         print(f"Arquivo gerado com sucesso: {self.final_video_file_name}")
