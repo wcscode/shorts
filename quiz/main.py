@@ -24,16 +24,16 @@ def main(page: ft.Page):
     style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=40))
     
     game = Game()
-
-    # Pergunta e alternativas
-    question = ft.Text(game.get_question(), text_align=ft.TextAlign.CENTER, size=40, weight=ft.FontWeight.BOLD)    
-
-    button1 = ft.ElevatedButton(game.get_answer(0), width=page.width, style=style_button)
-    button2 = ft.ElevatedButton(game.get_answer(1), width=page.width, style=style_button)
-    button3 = ft.ElevatedButton(game.get_answer(2), width=page.width, style=style_button)
-    button4 = ft.ElevatedButton(game.get_answer(3), width=page.width, style=style_button)   
     
-    buttons = [button1, button2, button3, button4]
+    g = game.get_question()
+
+    question = ft.Text(g["question"], text_align=ft.TextAlign.CENTER, size=40, weight=ft.FontWeight.BOLD)    
+
+    buttons = []
+
+    for answer in g["answers"]:
+        button = ft.ElevatedButton(answer, width=page.width, style=style_button)
+        buttons.append(button)
 
     progress_bar = ft.ProgressBar(height=10,color="amber", value=0)   
 
@@ -88,7 +88,7 @@ def main(page: ft.Page):
     timeline.wait("READ_QUESTION", audio_duration_1) 
     game_animation.progress_bar_update(page, progress_bar)
      
-    game_animation.highlight_correct_answer(buttons, game.get_correct_answer_index())
+    game_animation.highlight_correct_answer(buttons, g["correct_answer"])
     timeline.register("INIT_READ_ANSWER")
     timeline.wait("READ_ANSWER", audio_duration_2) 
 
@@ -104,11 +104,12 @@ def main(page: ft.Page):
     compiler.add_audio(audio.get_files_names()[0], timeline.recovery("INIT_READ_QUESTION")) 
     compiler.add_audio("success.mp3", timeline.recovery("INIT_READ_ANSWER")) 
     compiler.add_audio(audio.get_files_names()[1], timeline.recovery("INIT_READ_ANSWER")) 
-    compiler.add_audio("fast-whoosh.mp3", timeline.recovery("RETURN_SPLASH_SCREEN"))
+    compiler.add_audio("fast-whoosh.mp3", timeline.recovery("RETURN_SPLASH_SCREEN"), .5)
     compiler.add_background_music(
         "free-stile.mp3", 
         timeline.recovery("INIT_READ_QUESTION"),
-        timeline.recovery("RETURN_SPLASH_SCREEN")
+        timeline.recovery("RETURN_SPLASH_SCREEN"),
+        .4
     )
 
     compiler.compile()

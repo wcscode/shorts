@@ -1,3 +1,3 @@
-teste = {'a'}
+import html
 
-print(teste.get('a', 0))
+print(html.unescape("&quot;Wood and Coal&quot;, &quot;Wood and Coal&quot;"))

@@ -82,6 +82,6 @@ class ScreenRecorder:
             return self.geometry
 
         top, left, width, height = self.geometry
-        return (top, left, width, height)
+        return (top, left, width, height - 7)
 
    

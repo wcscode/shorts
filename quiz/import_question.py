@@ -1,6 +1,7 @@
 import requests
 import sqlite3
 import json
+import html
 from datetime import datetime
 
 # URL da API
@@ -36,11 +37,11 @@ CREATE TABLE IF NOT EXISTS quiz (
 
 # Inserir os dados no banco de dados
 for result in results:
-    category = result.get("category")
-    question = result.get("question")
-    correct_answer = result.get("correct_answer")
-    incorrect_answers = json.dumps(result.get("incorrect_answers"))  # Armazena como JSON
-    difficulty = result.get("difficulty")
+    category = html.escape(result.get("category"))
+    question = html.escape(result.get("question"))
+    correct_answer = html.escape(result.get("correct_answer"))
+    incorrect_answers = html.escape(json.dumps(result.get("incorrect_answers")))  # Armazena como JSON
+    difficulty = html.escape(result.get("difficulty"))
 
     # Verificar se a pergunta já existe na tabela
     cursor.execute("SELECT 1 FROM quiz WHERE question = ?", (question,))

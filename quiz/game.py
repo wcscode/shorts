@@ -1,27 +1,79 @@
+import sqlite3
+from datetime import datetime
+import random
+import html
+import json
+
 class Game:
     def __init__(self, amount=1):
         self.amount = amount
         self.index = 0
-        self.questions = ["Qual é a capital da França?"]        
-        self.answers = [["Londres", "Paris", "Berlim", "Roma"]]
-        self.corrects_answers = [0, 1]
-        self.corrects_answers[self.index] = 1 
+        self.questions = self.load_questions_from_db()  # Carregar perguntas do banco de dados
+        
+        # Se não houver perguntas, levanta uma exceção para indicar que o banco de dados está vazio
+        if not self.questions:
+            raise ValueError("Nenhuma pergunta encontrada no banco de dados.")
+        
+        self.question = self.questions[self.index]       
     
+    def load_questions_from_db(self):
+        conn = sqlite3.connect('quiz.db')
+        cursor = conn.cursor()
+        
+        # Recupera todas as perguntas armazenadas
+        cursor.execute("SELECT question, incorrect_answers, correct_answer FROM quiz")
+        rows = cursor.fetchall()
+        
+        # Converte os resultados para um formato utilizável
+        questions = []
+        for row in rows:
+            question, incorrect_answers_str, correct_answer = row
+            
+            question = html.unescape(question)
+            incorrect_answers_str = html.unescape(incorrect_answers_str)  # Converte as respostas de volta para uma lista
+            correct_answer = html.unescape(correct_answer)
+            answers = json.loads(incorrect_answers_str)
+           
+            # Adiciona a resposta correta à lista de respostas (caso não esteja)
+            if correct_answer not in answers:
+                answers.append(correct_answer)
+
+            # Embaralha as respostas para que a posição da resposta correta varie
+            random.shuffle(answers)
+            
+            questions.append({
+                "question": question,
+                "answers": answers,
+                "correct_answer": correct_answer
+            })
+        
+        conn.close()
+        return questions
+    
+    def mark_migration_date(self):
+        conn = sqlite3.connect('quiz.db')
+        cursor = conn.cursor()
+        
+        # Atualiza a data de migração para a data e hora atual
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        cursor.execute("UPDATE quiz SET date_migration = ? WHERE date_migration IS NULL", (current_time,))
+        
+        conn.commit()
+        conn.close()
+
+
+    def get_questions(self):
+        return self.questions
+
     def get_question(self):
-        return self.questions[self.index]
-
-    def get_answer(self, index):
-        return self.answers[self.index][index]
+        return self.question   
     
-    def get_correct_answer_index(self):
-        return self.corrects_answers[self.index]
-
     def get_question_and_answers_text(self):
-        return f'{self.get_question()}, {[self.get_answer(i) for i in range(0, 4)]}' 
+        return f'{self.question["question"]}, {", ".join(self.question["answers"])}' 
 
     def get_correct_answer_text(self):
-        return self.get_answer(self.get_correct_answer_index())
-
+        return self.question["correct_answer"]
+    
     def next(self):
-        if(self.index < self.amount - 1):
+        if self.index < self.amount - 1:
             self.index += 1

@@ -21,9 +21,10 @@ class GameAnimation:
             time.sleep(0.04)
             page.update()
 
-    def highlight_correct_answer(self, buttons, correct_answer_index):    
-        buttons[correct_answer_index].bgcolor = self.ft.Colors.GREEN  # Muda a cor de fundo para verde
-        buttons[correct_answer_index].update()
+    def highlight_correct_answer(self, buttons, correct_answer): 
+        button = [button for button in buttons if correct_answer in button.text][0]   
+        button.bgcolor = self.ft.Colors.GREEN  # Muda a cor de fundo para verde
+        button.update()
 
     def contador(self, page, text):
         contador = text
