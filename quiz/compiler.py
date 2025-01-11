@@ -20,12 +20,13 @@ class Compiler:
             "volume": volume
         })
 
-    def add_background_music(self, music_file_name, start_time=0, volume=0.5, loop=True):
+    def add_background_music(self, music_file_name, start_time=0, end_time=None, volume=0.5, loop=True):
         """Adiciona uma música de fundo à lista."""
         self.background_tracks.append({
             "file": music_file_name,
             "volume": volume,
             "start_time": start_time,
+            "end_time": end_time,
             "loop": loop
         })
 
@@ -60,18 +61,24 @@ class Compiler:
             # Obter informações da música de fundo
             bg_audio_info = ffmpeg.probe(os.path.join(self.directory, track["file"]))
             bg_audio_duration = float(bg_audio_info['format']['duration'])
-            sample_rate = int(bg_audio_info['streams'][0]['sample_rate'])  # Taxa de amostragem
+            #sample_rate = int(bg_audio_info['streams'][0]['sample_rate'])  # Taxa de amostragem
 
-            if track["loop"]:
-                # Calcula o número correto de quadros para o aloop
-                loop_size = int(sample_rate * bg_audio_duration)  # Quadros totais no áudio original
-                #bg_audio_volume = bg_audio_volume.filter('aloop', loop=-1, size=loop_size)                
+            # Ajustar a duração do áudio com base no end_time
+            start_time = track["start_time"]  # Padrão 0 se não definido
+            end_time = bg_audio_duration if track["end_time"] is None else track["end_time"]# Padrão para a duração total do áudio
 
-            delay_filter = f"{int(track['start_time'] * 1000)}|{int(track['start_time'] * 1000)}"  # Em milissegundos
-            delayed_bg_audio = bg_audio_volume.filter("adelay", delay_filter)
+            # Certifique-se de que o end_time não excede a duração total do áudio
+            end_time = min(end_time, bg_audio_duration)
+
+            # Aplicar o filtro atrim para ajustar a duração do áudio
+            trimmed_bg_audio = bg_audio_volume.filter('atrim', start=start_time, end=end_time).filter('asetpts', 'PTS-STARTPTS')
+
+            # Adicionar atraso ao áudio ajustado
+            delay_filter = f"{int(start_time * 1000)}|{int(start_time * 1000)}"  # Em milissegundos
+            delayed_bg_audio = trimmed_bg_audio.filter("adelay", delay_filter)
 
             audio_streams.append(delayed_bg_audio)
-       
+
         # Mesclar os áudios
         if len(audio_streams) > 1:
             mixed_audio = ffmpeg.filter(audio_streams, 'amix', inputs=len(audio_streams), duration='longest')
@@ -89,6 +96,6 @@ class Compiler:
             strict="experimental"
         ).overwrite_output().global_args('-hide_banner', '-loglevel', 'warning')
 
-        print("Passow...........................")
+        print("Processando...")
         ffmpeg_output.run()
         print(f"Arquivo gerado com sucesso: {self.final_video_file_name}")

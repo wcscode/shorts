@@ -15,8 +15,8 @@ def main(page: ft.Page):
     page.window.frameless = True
     page.window.top = 0
     page.window.left = 0
-    page.window.height = 360 #720  # Define a altura da janela
-    page.window.width = 640 #1280  # Define a largura da janela       
+    page.window.height = 720 #720 360  # Define a altura da janela
+    page.window.width = 1280 #1280 640  # Define a largura da janela       
     page.window.resizable = False  # Impede o redimensionamento da janela
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
@@ -102,8 +102,15 @@ def main(page: ft.Page):
    
     compiler.add_video(recorder.get_file_name())    
     compiler.add_audio(audio.get_files_names()[0], timeline.recovery("INIT_READ_QUESTION")) 
+    compiler.add_audio("success.mp3", timeline.recovery("INIT_READ_ANSWER")) 
     compiler.add_audio(audio.get_files_names()[1], timeline.recovery("INIT_READ_ANSWER")) 
-    compiler.add_background_music("free-stile.mp3", timeline.recovery("INIT_READ_QUESTION"))
+    compiler.add_audio("fast-whoosh.mp3", timeline.recovery("RETURN_SPLASH_SCREEN"))
+    compiler.add_background_music(
+        "free-stile.mp3", 
+        timeline.recovery("INIT_READ_QUESTION"),
+        timeline.recovery("RETURN_SPLASH_SCREEN")
+    )
+
     compiler.compile()
     
     page.window.destroy() 
