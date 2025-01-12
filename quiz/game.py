@@ -21,13 +21,13 @@ class Game:
         cursor = conn.cursor()
         
         # Recupera todas as perguntas armazenadas
-        cursor.execute("SELECT question, incorrect_answers, correct_answer FROM quiz")
+        cursor.execute("SELECT id, question, incorrect_answers, correct_answer FROM quiz WHERE compilation_date IS NULL")
         rows = cursor.fetchall()
         
         # Converte os resultados para um formato utilizável
         questions = []
         for row in rows:
-            question, incorrect_answers_str, correct_answer = row
+            id, question, incorrect_answers_str, correct_answer = row
             
             question = html.unescape(question)
             incorrect_answers_str = html.unescape(incorrect_answers_str)  # Converte as respostas de volta para uma lista
@@ -42,6 +42,7 @@ class Game:
             random.shuffle(answers)
             
             questions.append({
+                "id": id,
                 "question": question,
                 "answers": answers,
                 "correct_answer": correct_answer
@@ -50,13 +51,13 @@ class Game:
         conn.close()
         return questions
     
-    def mark_migration_date(self):
+    def mark_migration_date(self, id):
         conn = sqlite3.connect('quiz.db')
         cursor = conn.cursor()
         
         # Atualiza a data de migração para a data e hora atual
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        cursor.execute("UPDATE quiz SET date_migration = ? WHERE date_migration IS NULL", (current_time,))
+        cursor.execute("UPDATE quiz SET compilation_date = ? WHERE id = ?", (current_time, id))
         
         conn.commit()
         conn.close()

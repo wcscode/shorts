@@ -41,7 +41,7 @@ class Compiler:
         input_video = ffmpeg.input(os.path.join(self.directory, self.video_file_name))
 
         # Obter a duração do vídeo
-        video_duration = float(ffmpeg.probe(os.path.join(self.directory, self.video_file_name))['format']['duration'])
+        #video_duration = float(ffmpeg.probe(os.path.join(self.directory, self.video_file_name))['format']['duration'])
 
         # Preparar streams de áudio
         audio_streams = []
@@ -85,8 +85,13 @@ class Compiler:
         else:
             mixed_audio = audio_streams[0]
 
+        output_directory = os.path.join(self.directory, "output")
+        
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+
         # Gera a saída final
-        output_path = os.path.join(self.directory, self.final_video_file_name)
+        output_path = os.path.join(output_directory, self.final_video_file_name)
         ffmpeg_output = ffmpeg.output(
             input_video,
             mixed_audio,
@@ -97,5 +102,7 @@ class Compiler:
         ).overwrite_output().global_args('-hide_banner', '-loglevel', 'warning')
 
         print("Processando...")
-        ffmpeg_output.run()
-        print(f"Arquivo gerado com sucesso: {self.final_video_file_name}")
+        response = ffmpeg_output.run()
+        print(f"Arquivo gerado com sucesso: {self.final_video_file_name} {response}")
+
+        return response[1] is None

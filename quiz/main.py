@@ -1,5 +1,4 @@
 import flet as ft
-import time 
 from screen_recorder import ScreenRecorder
 from audio import Audio
 from compiler import Compiler
@@ -46,8 +45,9 @@ def main(page: ft.Page):
         question_container, button_container, progress_bar_container
     ]),rotate=-1.5708, padding=ft.padding.symmetric(horizontal=horizontal_padding))
 
-    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)
-    splash_screen_container = ft.Container(content=splash_screen_text,rotate=-1.5708)
+    logo = ft.Image(src="assets/images/logo.png", width=300, height=300)
+    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)    
+    splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text]),rotate=-1.5708)
 
     game_animation = GameAnimation(ft)
 
@@ -98,7 +98,7 @@ def main(page: ft.Page):
     timeline.wait("END_RECORD", 1)  
     recorder.stop_recording()  
     
-    compiler = Compiler()
+    compiler = Compiler(f"short_{g["id"]}.mp4")
    
     compiler.add_video(recorder.get_file_name())    
     compiler.add_audio(audio.get_files_names()[0], timeline.recovery("INIT_READ_QUESTION")) 
@@ -112,7 +112,9 @@ def main(page: ft.Page):
         .4
     )
 
-    compiler.compile()
+    #compiler.compile()
+    if compiler.compile():
+        game.mark_migration_date(g["id"])
     
     page.window.destroy() 
 
