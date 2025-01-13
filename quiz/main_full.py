@@ -14,19 +14,19 @@ def main(page: ft.Page):
     page.window.frameless = True
     page.window.top = 0
     page.window.left = 0
-    page.window.height = 720 #720 360  # Define a altura da janela
-    page.window.width = 1280 #1280 640  # Define a largura da janela       
+    page.window.height = 1440#720 #720 360  # Define a altura da janela
+    page.window.width = 2560#1280 #1280 640  # Define a largura da janela       
     page.window.resizable = False  # Impede o redimensionamento da janela
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    horizontal_padding = 20 + ((page.window.width - page.window.height) / 2)   
-    style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=40))
-    
+    horizontal_padding = 40 + ((page.window.width - page.window.height) / 2)   
+    style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=60))
+    #output_width, output_height = 1440, 2560
     game = Game()
     
     g = game.get_question()
 
-    question = ft.Text(g["question"], text_align=ft.TextAlign.CENTER, size=40, weight=ft.FontWeight.BOLD)    
+    question = ft.Text(g["question"], text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)    
 
     buttons = []
 
@@ -45,9 +45,9 @@ def main(page: ft.Page):
         question_container, button_container, progress_bar_container
     ]),rotate=-1.5708, padding=ft.padding.symmetric(horizontal=horizontal_padding))
 
-    logo = ft.Image(src="assets/images/logo_and_name.png", width=300, height=300)
-    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD) 
-    c  = ft.Text("", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)   
+    logo = ft.Image(src="assets/images/logo_and_name.png", width=500, height=500)
+    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=100, weight=ft.FontWeight.BOLD) 
+    c  = ft.Text("", text_align=ft.TextAlign.CENTER, size=80, weight=ft.FontWeight.BOLD)   
     splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text, c, c, c]),rotate=-1.5708)
 
     game_animation = GameAnimation(ft)

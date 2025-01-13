@@ -47,16 +47,19 @@ class Compiler:
         audio_streams = []
         for track in self.audio_tracks:
             audio = ffmpeg.input(os.path.join(self.directory, track["file"]))                        
-            audio_volume = audio.filter('volume', track["volume"])            
+            audio_volume = audio.filter('volume', volume=track["volume"])            
             delay_filter = f"{int(track['start_time'] * 1000)}|{int(track['start_time'] * 1000)}"  # Em milissegundos
             delayed_audio = audio_volume.filter("adelay", delay_filter)
 
             audio_streams.append(delayed_audio)
 
+        print("******************************************************")
+        print(track["volume"])
+
         # Processar músicas de fundo
         for track in self.background_tracks:
             bg_audio = ffmpeg.input(os.path.join(self.directory, track["file"]))                        
-            bg_audio_volume = bg_audio.filter('volume', track["volume"])            
+            bg_audio_volume = bg_audio.filter('volume', volume=track["volume"])            
 
             # Obter informações da música de fundo
             bg_audio_info = ffmpeg.probe(os.path.join(self.directory, track["file"]))
@@ -98,7 +101,7 @@ class Compiler:
             output_path,
             vcodec="libx264",
             acodec="aac",
-            strict="experimental"
+            strict="experimental"            
         ).overwrite_output().global_args('-hide_banner', '-loglevel', 'warning')
 
         print("Processando...")

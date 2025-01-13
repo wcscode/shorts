@@ -7,6 +7,9 @@ import os
 import time
 from timeline import Timeline
 
+print(cv2.getBuildInformation())
+#os.environ['PATH'] = r'C:\sqlite' + ";" + os.environ['PATH']
+
 class ScreenRecorder:
     def __init__(self, window_geometry, directory="files"):
         self.geometry = window_geometry  # (x, y, width, height)
@@ -35,20 +38,25 @@ class ScreenRecorder:
 
     def get_file_name(self):
         return self.video_file_name
-
+    
     def _record(self):
         top, left, width, height = self._geometry_adjustments()
 
         if not isinstance(width, int) or not isinstance(height, int):
             raise ValueError("Width and height must be integers.")
 
+        output_width, output_height = 1080, 1920
+        #output_width, output_height = 1440, 2560
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        #fourcc = cv2.VideoWriter_fourcc(*'H264')
+
         try:
             out = cv2.VideoWriter(
                 os.path.join(self.directory, self.video_file_name),
                 fourcc,
                 self.fps,
-                (height, width) # Inverte width e height
+                (output_width, output_height),
+                # Inverte width e height
                 #isColor=True
             )
         except Exception as e:
@@ -67,6 +75,7 @@ class ScreenRecorder:
                     frame = np.array(screenshot)
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)                   
                     frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+                    frame = cv2.resize(frame, (output_width, output_height))
                     out.write(frame)
                     frame_count += 1
                 else:
@@ -74,7 +83,7 @@ class ScreenRecorder:
 
         out.release()
         print("Gravação encerrada.")
-
+    
     def _geometry_adjustments(self):
         system = platform.system()
 
