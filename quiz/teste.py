@@ -17,10 +17,11 @@ def main(page: ft.Page):
     style_button = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=ft.padding.symmetric(vertical=25), color="white", text_style=ft.TextStyle(size=40))
 
 
-    logo = ft.Image(src="assets/images/logo.png", width=300, height=300)
+    logo = ft.Image(src="assets/images/logo_and_name.png", width=300, height=300)
     splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)    
     #splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text]),rotate=-1.5708)
-    splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text],alignment=ft.MainAxisAlignment.CENTER))
+    c = ft.Text("", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)
+    splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text, c, c, c],alignment=ft.MainAxisAlignment.CENTER))
 
 
     page.add(ft.Container(content=splash_screen_container)) 

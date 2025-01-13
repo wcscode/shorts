@@ -45,9 +45,10 @@ def main(page: ft.Page):
         question_container, button_container, progress_bar_container
     ]),rotate=-1.5708, padding=ft.padding.symmetric(horizontal=horizontal_padding))
 
-    logo = ft.Image(src="assets/images/logo.png", width=300, height=300)
-    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)    
-    splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text]),rotate=-1.5708)
+    logo = ft.Image(src="assets/images/logo_and_name.png", width=300, height=300)
+    splash_screen_text = ft.Text("Daily Quiz", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD) 
+    c  = ft.Text("", text_align=ft.TextAlign.CENTER, size=60, weight=ft.FontWeight.BOLD)   
+    splash_screen_container = ft.Container(content=ft.Column(controls=[logo, splash_screen_text, c, c, c]),rotate=-1.5708)
 
     game_animation = GameAnimation(ft)
 
@@ -81,7 +82,7 @@ def main(page: ft.Page):
     recorder = ScreenRecorder(geometry)    
     recorder.start_recording()
 
-    timeline.wait("INIT_SPLASH_SCREEN", 2)
+    timeline.wait("INIT_SPLASH_SCREEN", 1)
     change_content()    
 
     timeline.wait("INIT_READ_QUESTION", 1)
