@@ -7,7 +7,7 @@ import os
 import time
 from timeline import Timeline
 
-print(cv2.getBuildInformation())
+#print(cv2.getBuildInformation())
 #os.environ['PATH'] = r'C:\sqlite' + ";" + os.environ['PATH']
 
 class ScreenRecorder:

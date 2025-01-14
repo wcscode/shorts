@@ -25,7 +25,7 @@ def main(page: ft.Page):
     game = Game()
     
     g = game.get_question()
-
+    #print(game.get_question_and_answers_text())
     question = ft.Text(g["question"], text_align=ft.TextAlign.CENTER, size=40, weight=ft.FontWeight.BOLD)    
 
     buttons = []
@@ -99,7 +99,7 @@ def main(page: ft.Page):
     timeline.wait("END_RECORD", 1)  
     recorder.stop_recording()  
     
-    compiler = Compiler(f"short_{g["id"]}.mp4")
+    compiler = Compiler(f"quiz-{g["id"]}.mp4")
    
     compiler.add_video(recorder.get_file_name())    
     compiler.add_audio(audio.get_files_names()[0], timeline.recovery("INIT_READ_QUESTION")) 
@@ -113,9 +113,9 @@ def main(page: ft.Page):
         .08
     )
 
-    compiler.compile()
-    #if compiler.compile():
-    #    game.mark_migration_date(g["id"])
+    #compiler.compile()
+    if compiler.compile():
+        game.mark_migration_date(g["id"])
     
     page.window.destroy() 
 

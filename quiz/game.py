@@ -14,7 +14,7 @@ class Game:
         if not self.questions:
             raise ValueError("Nenhuma pergunta encontrada no banco de dados.")
         
-        self.question = self.questions[self.index]       
+        #self.question = self.questions[self.index]       
     
     def load_questions_from_db(self):
         conn = sqlite3.connect('quiz.db')
@@ -44,7 +44,7 @@ class Game:
             questions.append({
                 "id": id,
                 "question": question,
-                "answers": answers,
+                "answers": answers[:],
                 "correct_answer": correct_answer
             })
         
@@ -67,13 +67,13 @@ class Game:
         return self.questions
 
     def get_question(self):
-        return self.question   
+        return self.questions[self.index]   
     
     def get_question_and_answers_text(self):
-        return f'{self.question["question"]}, {", ".join(self.question["answers"])}' 
+        return f'{self.questions[self.index]["question"]}, {", ".join(self.questions[self.index]["answers"])}' 
 
     def get_correct_answer_text(self):
-        return self.question["correct_answer"]
+        return self.questions[self.index]["correct_answer"]
     
     def next(self):
         if self.index < self.amount - 1:

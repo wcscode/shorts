@@ -53,8 +53,8 @@ class Compiler:
 
             audio_streams.append(delayed_audio)
 
-        print("******************************************************")
-        print(track["volume"])
+        #print("******************************************************")
+        #print(track["volume"])
 
         # Processar músicas de fundo
         for track in self.background_tracks:
