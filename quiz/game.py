@@ -29,9 +29,9 @@ class Game:
         for row in rows:
             id, question, incorrect_answers_str, correct_answer = row
             
-            question = html.unescape(question)
-            incorrect_answers_str = html.unescape(incorrect_answers_str)  # Converte as respostas de volta para uma lista
-            correct_answer = html.unescape(correct_answer)
+            question = self.decode_html_entities(question)
+            incorrect_answers_str = self.decode_html_entities(incorrect_answers_str)  # Converte as respostas de volta para uma lista
+            correct_answer = self.decode_html_entities(correct_answer)
             answers = json.loads(incorrect_answers_str)
            
             # Adiciona a resposta correta à lista de respostas (caso não esteja)
@@ -51,6 +51,15 @@ class Game:
         conn.close()
         return questions
     
+    def decode_html_entities(self, value):
+        previous = value
+        while True:
+            current = html.unescape(previous)
+            if current == previous:  # Se nenhuma mudança ocorrer, finalize
+                break
+            previous = current
+        return current
+
     def mark_migration_date(self, id):
         conn = sqlite3.connect('quiz.db')
         cursor = conn.cursor()
